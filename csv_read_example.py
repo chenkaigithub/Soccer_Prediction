@@ -1,13 +1,15 @@
 import csv
 
 years = ['05','06','07','08','09','10','11','12','13','14','15','16']
-fieldnames = ['Year','HomeTeam','AwayTeam','FTHG','FTAG']
+fieldnames = ['Year','HomeTeam','AwayTeam','Diff']
 
 def handleFile(filePath,year):
 	with open(filePath) as csvfileread:
 		reader = csv.DictReader(csvfileread)			
-		for row in reader:			
-			row = {'Year':year,'HomeTeam':row['HomeTeam'],'AwayTeam':row['AwayTeam'],'FTHG':row['FTHG'],'FTAG':row['FTAG']}
+		for row in reader:	
+			if(row['HomeTeam'] == '' or row['AwayTeam'] == ''):
+				continue
+			row = {'Year':year,'HomeTeam':row['HomeTeam'],'AwayTeam':row['AwayTeam'],'Diff':(int(row['FTHG'])-int(row['FTAG']))}
 			writer.writerow(row)
 			
 def handleChampionshipLeague():
