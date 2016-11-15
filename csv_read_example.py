@@ -1,5 +1,39 @@
 import csv
-with open('./English_League_Games/Premier/PR_16.csv') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        print(row['Date'])
+
+years = ['05','06','07','08','09','10','11','12','13','14','15','16']
+fieldnames = ['Year','HomeTeam','AwayTeam','FTHG','FTAG']
+
+def handleFile(filePath,year):
+	with open(filePath) as csvfileread:
+		reader = csv.DictReader(csvfileread)			
+		for row in reader:			
+			row = {'Year':year,'HomeTeam':row['HomeTeam'],'AwayTeam':row['AwayTeam'],'FTHG':row['FTHG'],'FTAG':row['FTAG']}
+			writer.writerow(row)
+			
+def handleChampionshipLeague():
+	for year in years:
+		handleFile('./English_League_Games/Championship/CH_'+year+'.csv',year)
+		
+def handleLeagueOne():
+	for year in years:
+		handleFile('./English_League_Games/L1/L1_'+year+'.csv',year)
+		
+def handleLeagueTwo():
+	for year in years:
+		handleFile('./English_League_Games/L2/L2_'+year+'.csv',year)
+			
+def handlePremierLeague():
+	for year in years:
+		handleFile('./English_League_Games/Premier/PR_'+year+'.csv',year)
+
+with open('output.csv', 'w', newline='') as csvfilewrite:
+	writer = csv.DictWriter(csvfilewrite, fieldnames=fieldnames)
+	writer.writeheader()
+	handlePremierLeague()
+	handleChampionshipLeague()
+	handleLeagueOne()
+	handleLeagueTwo()
+		
+
+
+
