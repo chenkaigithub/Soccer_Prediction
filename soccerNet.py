@@ -4,26 +4,30 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
 from keras.optimizers import SGD, Adam, RMSprop
 
+number_of_teams = 107
+
 # Prepare data for the neural net
 
 def prepare_batch(games_mat):
     start_year = 5
     year_column = games_mat[:,0].reshape(-1,1) - start_year
-    home_mat = np_utils.to_categorical(games_mat[:,1])
-    away_mat = np_utils.to_categorical(games_mat[:,2])
+    home_mat = np_utils.to_categorical(games_mat[:,1], nb_classes=number_of_teams)
+    away_mat = np_utils.to_categorical(games_mat[:,2], nb_classes=number_of_teams)
     x = np.hstack([year_column, home_mat, away_mat])
 
     dif_column = games_mat[:,3]
     dif_column[dif_column > 0] = 1 # Home wins
     dif_column[dif_column < 0] = 2 # Away wins
-    y = np_utils.to_categorical(dif_column)
+    y = np_utils.to_categorical(dif_column, nb_classes=3)
 
     return (x, y)
 
-origMat = np.genfromtxt("games.csv", delimiter=',', dtype='int')
-np.random.shuffle(origMat)
+mat = np.genfromtxt("games.csv", delimiter=',', dtype='int')
+# Eliminate home vs away favoring:
+# mat = np.vstack([mat, mat[:, np.argsort([0,2,1,3])]])
+np.random.shuffle(mat)
 
-pieces = np.vsplit(origMat, 6)
+pieces = np.vsplit(mat, 6)
 
 (train_x, train_y) = prepare_batch(np.vstack(pieces[:4]))
 (test_x, test_y) = prepare_batch(pieces[4])
