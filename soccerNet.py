@@ -16,18 +16,21 @@ def prepare_batch(games_mat):
     x = np.hstack([year_column, home_mat, away_mat])
 
     dif_column = games_mat[:,3]
-    dif_column[dif_column > 0] = 1 # Home wins
-    dif_column[dif_column < 0] = 2 # Away wins
+    dif_column[dif_column > 0] = 1 # First team wins
+    dif_column[dif_column < 0] = 2 # First team loses
     y = np_utils.to_categorical(dif_column, nb_classes=3)
 
     return (x, y)
 
 mat = np.genfromtxt("games.csv", delimiter=',', dtype='int')
 # Eliminate home vs away favoring:
-# mat = np.vstack([mat, mat[:, np.argsort([0,2,1,3])]])
-np.random.shuffle(mat)
+n_mat = np.copy(mat[:, np.argsort([0,2,1,3])])
+n_mat[:,3] *= -1
+last_mat = np.vstack([mat, n_mat])
 
-pieces = np.vsplit(mat, 6)
+np.random.shuffle(last_mat)
+
+pieces = np.vsplit(last_mat, 6)
 
 (train_x, train_y) = prepare_batch(np.vstack(pieces[:4]))
 (test_x, test_y) = prepare_batch(pieces[4])
@@ -36,7 +39,7 @@ pieces = np.vsplit(mat, 6)
 # Use neural net on data
 
 batch_size = 64
-nb_epoch = 50
+nb_epoch = 100
 
 model = Sequential([
     Dense(64, input_dim=train_x.shape[1]),
@@ -60,5 +63,16 @@ history = model.fit(train_x, train_y,
                     verbose=1, validation_data=(valid_x, valid_y))
 
 (score, accuracy) = model.evaluate(test_x, test_y, verbose=0)
+
 print('Test score:', score)
 print('Test accuracy:', accuracy)
+
+predicted = model.predict_classes(test_x, verbose=0)
+
+def percentage_equal_to(arr, val):
+    return (arr == val).sum() * 100 / arr.size
+
+print("Predictions:")
+print("No winner:", percentage_equal_to(predicted, 0), "%")
+print("First team winner:", percentage_equal_to(predicted, 1), "%")
+print("First team lost:", percentage_equal_to(predicted, 2), "%")
