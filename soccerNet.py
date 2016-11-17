@@ -3,6 +3,7 @@ from keras.utils import np_utils
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
 from keras.optimizers import SGD, Adam, RMSprop
+from keras.layers.advanced_activations import *
 
 number_of_teams = 107
 
@@ -23,10 +24,11 @@ def prepare_batch(games_mat):
     return (x, y)
 
 mat = np.genfromtxt("games.csv", delimiter=',', dtype='int')
+last_mat = mat
 # Eliminate home vs away favoring:
-n_mat = np.copy(mat[:, np.argsort([0,2,1,3])])
-n_mat[:,3] *= -1
-last_mat = np.vstack([mat, n_mat])
+# n_mat = np.copy(mat[:, np.argsort([0,2,1,3])])
+# n_mat[:,3] *= -1
+# last_mat = np.vstack([mat, n_mat])
 
 np.random.shuffle(last_mat)
 
@@ -38,16 +40,18 @@ pieces = np.vsplit(last_mat, 6)
 
 # Use neural net on data
 
-batch_size = 64
-nb_epoch = 100
+batch_size = 16
+nb_epoch = 40
 
 model = Sequential([
-    Dense(64, input_dim=train_x.shape[1]),
-    Activation('relu'),
+    Dense(32, input_dim=train_x.shape[1]),
+    Activation(LeakyReLU()),
     Dropout(0.5),
-    Dense(64),
-    Activation('relu'),
+
+    Dense(32),
+    Activation(LeakyReLU()),
     Dropout(0.5),
+
     Dense(3),
     Activation('softmax'),
 ])
@@ -76,3 +80,11 @@ print("Predictions:")
 print("No winner:", percentage_equal_to(predicted, 0), "%")
 print("First team winner:", percentage_equal_to(predicted, 1), "%")
 print("First team lost:", percentage_equal_to(predicted, 2), "%")
+
+def col_percentage_positive(arr, column):
+    return arr[:,column].sum() * 100 / arr.shape[0]
+
+print("True values:")
+print("No winner:", col_percentage_positive(test_y, 0), "%")
+print("First team winner:", col_percentage_positive(test_y, 1), "%")
+print("First team lost:", col_percentage_positive(test_y, 2), "%")
