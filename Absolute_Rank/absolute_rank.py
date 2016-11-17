@@ -20,3 +20,9 @@ for i in range(number_of_teams):
 	
 np.savetxt("scores.csv", scores, delimiter=",")
 
+rank = np.ones((number_of_teams,1))
+for i in range(200):
+	rank = np.sqrt(np.abs(np.dot(scores,rank)))
+	
+np.savetxt("rank.csv", rank, delimiter=",")
+
