@@ -9,6 +9,7 @@ from keras import backend as K
 
 
 number_of_teams = 107
+margin = 1/3
 
 # Prepare data for the neural net    
 
@@ -88,14 +89,14 @@ Network = Model(input=[input1,input2,Year],output=output)
 
 Network.summary()
 
-Network.compile(loss='mean_squared_error',
+Network.compile(loss='hinge',
               optimizer=RMSprop(lr=0.0001),
               metrics=['accuracy']) #To Ziv and Itay: you can change this to
                                     #SVM if you want.
          
-history = Network.fit([train_home,train_away,train_years], train_y,
+history = Network.fit([train_home,train_away,train_years],train_y/margin,
                     batch_size=batch_size, nb_epoch=nb_epoch,
-                    verbose=1, validation_data=([valid_home,valid_away,valid_years], valid_y))
+                    verbose=1, validation_data=([valid_home,valid_away,valid_years], valid_y/margin))
    
            
 (score, accuracy) = Network.evaluate([test_home,test_away,test_years], test_y, verbose=0)
@@ -103,4 +104,5 @@ print('Test score:', score)
 print('Test accuracy:', accuracy)
 
 
-predicted = Network.predict([test_home,test_away,test_years], verbose=0)
+predicted = (Network.predict([test_home,test_away,test_years], verbose=0) * margin)
+predicted = predicted.reshape((predicted.shape[0],))
