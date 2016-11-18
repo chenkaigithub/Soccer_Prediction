@@ -100,9 +100,11 @@ history = Network.fit([train_home,train_away,train_years],train_y/margin,
    
            
 (score, accuracy) = Network.evaluate([test_home,test_away,test_years], test_y, verbose=0)
-print('Test score:', score)
-print('Test accuracy:', accuracy)
 
 
 predicted = (Network.predict([test_home,test_away,test_years], verbose=0) * margin)
 predicted = predicted.reshape((predicted.shape[0],))
+
+print("The predicted scores are; " + str(predicted))
+print("The difference between the predicted scores and the real scores is; " + str(predicted-test_y))
+print("The average error is: " + str(np.mean(np.abs(predicted-test_y))))
