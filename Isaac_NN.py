@@ -67,7 +67,7 @@ shared_layer = Dropout(0.5)
 x1 = shared_layer(x1)
 x2 = shared_layer(x2)
 
-shared_layer = Dense(32,activation='softmax')
+shared_layer = Dense(32)
 x1 = shared_layer(x1)
 x2 = shared_layer(x2)
 
@@ -79,7 +79,7 @@ y = Dense(64,activation='relu')(props)
 y = Dropout(0.5)(y)
 y = Dense(64,activation='relu')(y)
 y = Dropout(0.5)(y)
-output = Dense(1,activation='softmax')(y)
+output = Dense(1)(y)
 
 
 Network = Model(input=[input1,input2,Year],output=output)
@@ -103,3 +103,4 @@ print('Test score:', score)
 print('Test accuracy:', accuracy)
 
 
+predicted = Network.predict([test_home,test_away,test_years], verbose=0)
