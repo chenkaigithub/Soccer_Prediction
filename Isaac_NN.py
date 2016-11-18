@@ -23,7 +23,7 @@ def prepare_batch(games_mat):
     dif_column[dif_column < 0] = 2 # Away wins
     y = np_utils.to_categorical(dif_column, nb_classes=3)
 
-    return (year_column,home_mat,away_mat,y)
+    return (year_column,home_mat,away_mat,games_mat[:,3])
 
 mat = np.genfromtxt("games.csv", delimiter=',', dtype='int')
 # Eliminate home vs away favoring:
@@ -39,7 +39,7 @@ pieces = np.vsplit(mat, 6)
 # Use neural net on data
 
 batch_size = 64
-nb_epoch = 30
+nb_epoch = 10
 
 #Creating the network
 
@@ -59,7 +59,7 @@ shared_layer = Dropout(0.5)
 x1 = shared_layer(x1)
 x2 = shared_layer(x2)
 
-shared_layer = Dense(16,activation='relu')
+shared_layer = Dense(64,activation='relu')
 x1 = shared_layer(x1)
 x2 = shared_layer(x2)
 
@@ -67,7 +67,7 @@ shared_layer = Dropout(0.5)
 x1 = shared_layer(x1)
 x2 = shared_layer(x2)
 
-shared_layer = Dense(8,activation='softmax')
+shared_layer = Dense(32,activation='softmax')
 x1 = shared_layer(x1)
 x2 = shared_layer(x2)
 
@@ -75,11 +75,11 @@ props = merge([x1,x2],mode='concat')
 
 #From here we define NN2
 
-y = Dense(16,activation='relu')(props)
+y = Dense(64,activation='relu')(props)
 y = Dropout(0.5)(y)
-y = Dense(16,activation='relu')(y)
+y = Dense(64,activation='relu')(y)
 y = Dropout(0.5)(y)
-output = Dense(3,activation='softmax')(y)
+output = Dense(1,activation='softmax')(y)
 
 
 Network = Model(input=[input1,input2,Year],output=output)
@@ -92,7 +92,7 @@ Network.compile(loss='mean_squared_error',
               optimizer=RMSprop(lr=0.0001),
               metrics=['accuracy']) #To Ziv and Itay: you can change this to
                                     #SVM if you want.
-              
+         
 history = Network.fit([train_home,train_away,train_years], train_y,
                     batch_size=batch_size, nb_epoch=nb_epoch,
                     verbose=1, validation_data=([valid_home,valid_away,valid_years], valid_y))
