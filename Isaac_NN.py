@@ -56,20 +56,20 @@ x1 = shared_layer(input1f)
 x2 = shared_layer(input2f)
 
 shared_layer = Dropout(0.5)
-x1 = shared_layer(input1f)
-x2 = shared_layer(input2f)
+x1 = shared_layer(x1)
+x2 = shared_layer(x2)
 
 shared_layer = Dense(16,activation='relu')
-x1 = shared_layer(input1f)
-x2 = shared_layer(input2f)
+x1 = shared_layer(x1)
+x2 = shared_layer(x2)
 
 shared_layer = Dropout(0.5)
-x1 = shared_layer(input1f)
-x2 = shared_layer(input2f)
+x1 = shared_layer(x1)
+x2 = shared_layer(x2)
 
 shared_layer = Dense(8,activation='softmax')
-x1 = shared_layer(input1f)
-x2 = shared_layer(input2f)
+x1 = shared_layer(x1)
+x2 = shared_layer(x2)
 
 props = merge([x1,x2],mode='concat')
 
@@ -96,7 +96,10 @@ Network.compile(loss='mean_squared_error',
 history = Network.fit([train_home,train_away,train_years], train_y,
                     batch_size=batch_size, nb_epoch=nb_epoch,
                     verbose=1, validation_data=([valid_home,valid_away,valid_years], valid_y))
-              
-
+   
+           
+(score, accuracy) = Network.evaluate([test_home,test_away,test_years], test_y, verbose=0)
+print('Test score:', score)
+print('Test accuracy:', accuracy)
 
 
