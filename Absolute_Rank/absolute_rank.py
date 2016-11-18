@@ -22,7 +22,7 @@ np.savetxt("scores.csv", scores, delimiter=",")
 
 rank = np.ones((number_of_teams,1))
 for i in range(30):
-	rank = np.abs(np.dot(scores,rank)) / (np.sum(rank) / 107)
+	rank = np.square((np.dot(scores,rank)) / (np.sum(rank) / 107))
 	
 np.savetxt("rank.csv", rank, delimiter=",")
 
