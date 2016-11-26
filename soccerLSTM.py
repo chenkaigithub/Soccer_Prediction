@@ -41,9 +41,7 @@ home_sequences = get_side_sequences("home")
 away_sequences = get_side_sequences("away")
 both_sequences = mat[:,:-1,[0,3]].copy()
 y = mat[:,-1,3].copy()
-y[y > 0] = 1
-y[y < 0] = 2
-y = to_categorical(y, nb_classes=3)
+y = to_categorical((y>0)*1 + (y<0)*2, nb_classes=3)
 
 input_both = Input(shape=(timesteps,2))
 input_home = Input(shape=(timesteps,1))
