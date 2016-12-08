@@ -9,8 +9,8 @@ mat = pd.read_csv("games.csv").as_matrix()
 
 start_year = 5
 year_col = mat[:,0].copy().reshape(-1,1) - start_year
-encoded_sides = OneHotEncoder(n_values=[107,107], sparse=False).fit_transform(mat[:,1:3])
-x = np.hstack([year_col, encoded_sides])
+encoded_teams = OneHotEncoder(n_values=[107,107], sparse=False).fit_transform(mat[:,1:3])
+x = np.hstack([year_col, encoded_teams])
 y = (mat[:,3] > 0)*1 + (mat[:,3] < 0)*2
 
 train_x, test_x, train_y, test_y = train_test_split(x, y, test_size=0.2)
