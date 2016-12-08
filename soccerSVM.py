@@ -13,8 +13,7 @@ encoded_sides = OneHotEncoder(n_values=[107,107], sparse=False).fit_transform(ma
 x = np.hstack([year_col, encoded_sides])
 
 y = mat[:,3].copy()
-y[y>0] = 1
-y[y<0] = 2
+y = (y > 0)*1 + (y < 0)*2
 
 train_x, test_x, train_y, test_y = train_test_split(x, y, test_size=0.2)
 
